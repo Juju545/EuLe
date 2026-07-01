@@ -3,21 +3,69 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EuLe</title>
+    <title>EuLe – Digitaler Schulassistent</title>
 
     <link rel="stylesheet" href="css/style.css">
 </head>
-
 <body>
 
-<header>
+<header class="hero">
     <h1>🦉 EuLe</h1>
     <p>Dein digitaler Schulassistent</p>
+
+    <input
+        type="text"
+        placeholder="🔍 Raum, Ort oder Frage suchen..."
+        class="search-bar">
 </header>
 
-<main>
+<main class="cards">
+
+    <div class="card">
+        🗺️
+        <h2>Gebäudepläne</h2>
+        <p>Finde jeden Raum.</p>
+    </div>
+
+    <div class="card">
+        📚
+        <h2>Eule-System</h2>
+        <p>Infos zu allen Eulen.</p>
+    </div>
+
+    <div class="card">
+        ⏱️
+        <h2>Timer</h2>
+        <p>Arbeitsphasen starten.</p>
+    </div>
 
 </main>
+
+<button class="chat-button">🦉</button>
+
+<div class="chat-window" id="chatWindow">
+
+    <div class="chat-header">
+        🦉 EuLe
+        <button id="closeChat" class="close-button">×</button>
+    </div>
+
+    <div class="chat-messages" id="chatMessages">
+        <div class="bot-message">
+            👋 Hallo Julius!<br>
+            Ich bin EuLe. Wie kann ich dir helfen?
+        </div>
+    </div>
+
+    <div class="chat-input">
+        <input type="text" id="userInput" placeholder="Nachricht schreiben...">
+        <button id="sendButton">➤</button>
+    </div>
+
+</div>
+    </div>
+</div>
+</button>
 
 <script src="js/data.js"></script>
 <script src="js/timer.js"></script>
