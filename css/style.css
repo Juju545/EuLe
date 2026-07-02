@@ -968,3 +968,30 @@ button, input{
         justify-content:flex-start;
     }
 }
+
+
+
+
+
+.map-room-card h3{
+    font-size:24px;
+    margin:0;
+}
+
+
+.map-room-card p{
+    color:#33485f;
+    line-height:1.5;
+    margin:0 0 12px;
+}
+
+
+.map-room-meta span{
+    background:#f1f6fd;
+    color:#234;
+    border-radius:999px;
+    padding:8px 12px;
+    font-size:14px;
+    font-weight:700;
+}
+
