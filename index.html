@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EuLe – Digitaler Schulassistent</title>
-
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -33,7 +32,7 @@
         <p>Infos zu allen Eulen.</p>
     </div>
 
-    <div class="card">
+    <div class="card" onclick="openTimer()">
         ⏱️
         <h2>Timer</h2>
         <p>Arbeitsphasen starten.</p>
@@ -41,31 +40,69 @@
 
 </main>
 
-<button class="chat-button">🦉</button>
+<button class="chat-button" type="button" aria-label="EuLe öffnen">🦉</button>
 
-<div class="chat-window" id="chatWindow">
-
+<div class="chat-window" id="chatWindow" aria-label="EuLe Chat">
     <div class="chat-header">
         🦉 EuLe
-        <button id="closeChat" class="close-button">×</button>
+        <button id="closeChat" class="close-button" type="button" aria-label="Chat schließen">×</button>
     </div>
 
-    <div class="chat-messages" id="chatMessages">
+    <div class="chat-messages" id="chatMessages" role="log" aria-live="polite" aria-label="Chatverlauf">
         <div class="bot-message">
-            👋 Hallo Julius!<br>
-            Ich bin EuLe. Wie kann ich dir helfen?
+            <strong>🟢 EuLe online</strong>
+            <br><br>
+            👋 Willkommen!
+            <br><br>
+            Ich bin EuLe, dein digitaler Schulassistent.
+            <br><br>
+            Wie kann ich dir helfen?
+        </div>
+
+        <div class="quick-buttons">
+            <button class="quick-btn" type="button" data-action="query" data-value="Raum suchen">📍 Raum suchen</button>
+            <button class="quick-btn" type="button" data-action="query" data-value="Eule-System">📚 Eule-System</button>
+            <button class="quick-btn" type="button" data-action="openTimer">⏱️ Timer</button>
+            <button class="quick-btn" type="button" data-action="query" data-value="Hilfe">❓ Hilfe</button>
         </div>
     </div>
 
     <div class="chat-input">
-        <input type="text" id="userInput" placeholder="Nachricht schreiben...">
-        <button id="sendButton">➤</button>
+        <input type="text" id="userInput" placeholder="Nachricht schreiben..." aria-label="Nachricht schreiben">
+        <button id="sendButton" type="button" aria-label="Nachricht senden">➤</button>
     </div>
+</div>
 
+<div id="timerOverlay" class="timer-overlay" aria-hidden="true">
+    <section class="timer-card" role="dialog" aria-modal="true" aria-label="EuLe Timer">
+        <div class="timer-topbar">
+            <button class="timer-back" type="button" onclick="closeTimer()">← Zurück</button>
+            <div class="timer-chip">⏱️ Timer</div>
+            <button class="timer-fullscreen" type="button" onclick="toggleTimerFullscreen()" aria-label="Vollbild umschalten">⤢</button>
+        </div>
+
+        <div class="timer-status" id="timerStatus">Phase 1 / 5</div>
+        <h2 class="timer-phase-title" id="phaseTitle">Vorbereitung</h2>
+        <div class="timer-time" id="timerDisplay">10:00</div>
+
+        <div class="timer-adjust" id="timerAdjust">
+            <button type="button" onclick="adjustTime(-60)">➖</button>
+            <button type="button" onclick="adjustTime(60)">➕</button>
+        </div>
+
+        <div class="timer-progress" aria-hidden="true">
+            <div class="timer-progress-bar" id="timerProgressBar"></div>
+        </div>
+
+        <div class="timer-controls">
+            <button type="button" id="timerStartBtn" onclick="startTimer()">▶️ Start</button>
+            <button type="button" id="timerPauseBtn" onclick="pauseTimer()">⏸️ Pause</button>
+            <button type="button" id="timerResetBtn" onclick="resetTimer()">🔄 Reset</button>
+        </div>
+
+        <p class="timer-finish" id="timerFinish" hidden>🎉 Timer beendet.</p>
+    </section>
 </div>
-    </div>
-</div>
-</button>
 
 <script src="js/data.js"></script>
 <script src="js/timer.js"></script>

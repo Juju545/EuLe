@@ -8,6 +8,7 @@
 body{
     background:#eef5ff;
     color:#222;
+    min-height:100vh;
 }
 
 /* ---------- HEADER ---------- */
@@ -56,6 +57,7 @@ body{
     box-shadow:0 10px 30px rgba(0,0,0,.12);
     transition:.3s;
     cursor:pointer;
+    user-select:none;
 }
 
 .card:hover{
@@ -69,30 +71,23 @@ body{
 /* ---------- CHAT BUTTON ---------- */
 
 .chat-button{
-
     position:fixed;
     right:30px;
     bottom:30px;
-
     width:75px;
     height:75px;
-
     border:none;
     border-radius:50%;
-
     background:#ff9800;
-
     display:flex;
     justify-content:center;
     align-items:center;
-
     font-size:36px;
-
+    line-height:1;
     cursor:pointer;
-
     box-shadow:0 10px 30px rgba(0,0,0,.25);
-
     transition:.25s;
+    z-index:9000;
 }
 
 .chat-button:hover{
@@ -102,206 +97,392 @@ body{
 /* ---------- CHAT ---------- */
 
 .chat-window{
-
     position:fixed;
-
     right:30px;
-
     bottom:120px;
-
     width:340px;
-
     height:500px;
-
     background:white;
-
     border-radius:20px;
-
     overflow:hidden;
-
     box-shadow:0 15px 40px rgba(0,0,0,.25);
-
     display:none;
-
     flex-direction:column;
+    z-index:9100;
+    animation:chatPop .18s ease-out;
+}
+
+@keyframes chatPop{
+    from{ transform:translateY(16px) scale(.98); opacity:.4; }
+    to{ transform:translateY(0) scale(1); opacity:1; }
 }
 
 .chat-header{
-
     background:#1e88e5;
-
     color:white;
-
     padding:18px;
-
     font-size:20px;
-
     display:flex;
-
     justify-content:space-between;
-
     align-items:center;
 }
 
-/* ---------- X BUTTON ---------- */
-
 .close-button{
-
     background:transparent;
-
     border:none;
-
     color:white;
-
     font-size:24px;
-
     font-weight:bold;
-
     cursor:pointer;
-
     transition:.2s;
-
     padding:0 5px;
+    line-height:1;
 }
 
 .close-button:hover{
-
     color:#ffd54f;
-
     transform:scale(1.2);
 }
 
-/* ---------- NACHRICHTEN ---------- */
-
 .chat-messages{
-
     flex:1;
-
     padding:15px;
-
     overflow-y:auto;
-
     background:#f7f9fc;
 }
 
 .bot-message{
-
     background:#e3f2fd;
-
     padding:12px;
-
     border-radius:14px;
-
     margin-bottom:15px;
-
     width:fit-content;
-
     max-width:85%;
+    line-height:1.4;
 }
 
 .user-message{
-
     background:#1e88e5;
-
     color:white;
-
     padding:12px;
-
     border-radius:14px;
-
     margin-bottom:15px;
-
     margin-left:auto;
-
     width:fit-content;
-
     max-width:85%;
+    line-height:1.4;
+}
+
+/* ---------- SCHNELLBUTTONS ---------- */
+
+.quick-buttons{
+    display:grid;
+    gap:10px;
+    margin-top:15px;
+}
+
+.quick-btn{
+    border:none;
+    background:#1e88e5;
+    color:white;
+    padding:12px;
+    border-radius:12px;
+    cursor:pointer;
+    font-size:15px;
+    transition:.2s;
+}
+
+.quick-btn:hover{
+    background:#1565c0;
+    transform:translateY(-2px);
 }
 
 /* ---------- EINGABE ---------- */
 
 .chat-input{
-
     display:flex;
-
     border-top:1px solid #ddd;
 }
 
 .chat-input input{
-
     flex:1;
-
     padding:15px;
-
     border:none;
-
     outline:none;
-
     font-size:16px;
 }
 
 .chat-input button{
-
     width:60px;
-
     height:60px;
-
     border:none;
-
     background:#ff9800;
-
     color:white;
-
     font-size:22px;
-
     cursor:pointer;
-
     display:flex;
-
     justify-content:center;
-
     align-items:center;
-
     outline:none;
-
     box-shadow:none;
-
-    transition:background .2s;
+    transition:background .2s, transform .2s;
 }
 
 .chat-input button:hover{
-
     background:#fb8c00;
 }
 
 .chat-input button:focus,
 .chat-input button:focus-visible{
-
     outline:none;
-
     box-shadow:none;
 }
 
 .chat-input button:active{
-
     transform:none;
+}
+
+/* ---------- TIMER ---------- */
+
+.timer-overlay{
+    position:fixed;
+    inset:0;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+    background:rgba(8,18,32,.72);
+    z-index:9500;
+    backdrop-filter:blur(2px);
+    transition:background .18s ease;
+}
+
+.timer-overlay.is-visible{
+    display:flex;
+}
+
+.timer-overlay.flash{
+    background:rgba(255, 236, 79, .88);
+}
+
+.timer-overlay.flash .timer-card{
+    animation:timerBlinkCard .32s ease-in-out 0s 3;
+}
+
+.timer-overlay.flash .timer-time,
+.timer-overlay.flash .timer-phase-title,
+.timer-overlay.flash .timer-status{
+    animation:timerBlinkText .32s ease-in-out 0s 3;
+}
+
+@keyframes timerBlinkCard{
+    0%,100%{
+        transform:scale(1);
+        box-shadow:0 20px 60px rgba(0,0,0,.25);
+    }
+    50%{
+        transform:scale(1.018);
+        box-shadow:0 24px 72px rgba(255, 214, 0, .5);
+    }
+}
+
+@keyframes timerBlinkText{
+    0%,100%{ opacity:1; }
+    50%{ opacity:.18; }
+}
+
+.timer-card{
+    width:min(540px, 100%);
+    background:linear-gradient(180deg,#ffffff,#f4f9ff);
+    border-radius:26px;
+    padding:24px;
+    box-shadow:0 20px 60px rgba(0,0,0,.25);
+    text-align:center;
+    animation:timerPop .2s ease-out;
+}
+
+@keyframes timerPop{
+    from{ transform:translateY(12px) scale(.985); opacity:.45; }
+    to{ transform:translateY(0) scale(1); opacity:1; }
+}
+
+.timer-topbar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:12px;
+    margin-bottom:18px;
+}
+
+.timer-chip{
+    background:#e3f2fd;
+    color:#1565c0;
+    padding:10px 14px;
+    border-radius:999px;
+    font-weight:700;
+}
+
+.timer-back,
+.timer-fullscreen{
+    border:none;
+    background:#eaf1ff;
+    color:#1e88e5;
+    width:44px;
+    height:44px;
+    border-radius:50%;
+    cursor:pointer;
+    font-size:18px;
+    display:grid;
+    place-items:center;
+    transition:.2s;
+}
+
+.timer-back:hover,
+.timer-fullscreen:hover{
+    background:#dce9ff;
+    transform:scale(1.04);
+}
+
+.timer-status{
+    color:#5f6f87;
+    font-weight:700;
+    letter-spacing:.02em;
+    margin-bottom:6px;
+}
+
+.timer-phase-title{
+    font-size:32px;
+    margin-bottom:14px;
+    color:#15324d;
+}
+
+.timer-time{
+    font-size:clamp(58px, 12vw, 86px);
+    font-weight:800;
+    letter-spacing:.04em;
+    color:#0f2740;
+    margin:10px 0 20px;
+    line-height:1;
+}
+
+.timer-adjust{
+    display:flex;
+    justify-content:center;
+    gap:14px;
+    margin-bottom:18px;
+}
+
+.timer-adjust button,
+.timer-controls button{
+    border:none;
+    border-radius:16px;
+    cursor:pointer;
+    transition:.2s;
+    font-weight:700;
+}
+
+.timer-adjust button{
+    width:74px;
+    height:56px;
+    font-size:22px;
+    background:#eaf1ff;
+    color:#1565c0;
+}
+
+.timer-adjust button:hover{
+    background:#dbe8ff;
+    transform:translateY(-2px);
+}
+
+.timer-progress{
+    width:100%;
+    height:16px;
+    background:#dbe6f4;
+    border-radius:999px;
+    overflow:hidden;
+    margin-bottom:18px;
+}
+
+.timer-progress-bar{
+    width:0%;
+    height:100%;
+    background:linear-gradient(90deg,#1e88e5,#42a5f5);
+    border-radius:inherit;
+    transition:width .18s linear;
+}
+
+.timer-controls{
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:center;
+    gap:12px;
+    margin-bottom:10px;
+}
+
+.timer-controls button{
+    padding:14px 18px;
+    min-width:110px;
+    background:#1e88e5;
+    color:white;
+    font-size:16px;
+}
+
+.timer-controls button:hover{
+    background:#1565c0;
+    transform:translateY(-2px);
+}
+
+.timer-finish{
+    margin-top:8px;
+    font-size:18px;
+    font-weight:700;
+    color:#0f7a46;
 }
 
 /* ---------- RESPONSIVE ---------- */
 
 @media(max-width:600px){
+    .hero{
+        padding:50px 18px;
+    }
+
+    .hero h1{
+        font-size:48px;
+    }
 
     .cards{
         padding:20px;
     }
 
     .chat-window{
-
         width:95%;
-
         right:2.5%;
-
         bottom:100px;
     }
 
+    .chat-button{
+        right:18px;
+        bottom:18px;
+        width:68px;
+        height:68px;
+        font-size:32px;
+    }
+
+    .timer-card{
+        padding:18px;
+        border-radius:22px;
+    }
+
+    .timer-phase-title{
+        font-size:26px;
+    }
+
+    .timer-adjust button{
+        width:66px;
+        height:52px;
+    }
+
+    .timer-controls button{
+        min-width:96px;
+    }
 }
