@@ -1264,3 +1264,113 @@ html[data-theme="dark"] .calc-display{
 html[data-theme="dark"] .search-shell{
     border:1px solid #2a3b55;
 }
+
+
+/* ---------- EULE SYSTEM FIX ---------- */
+.eule-card{
+    color:#fff;
+    position:relative;
+    overflow:hidden;
+}
+
+.eule-card::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(0,0,0,.10));
+    pointer-events:none;
+}
+
+.eule-card h3,
+.eule-card p{
+    position:relative;
+    z-index:1;
+}
+
+.eule-card h3{
+    margin-top:2px;
+    margin-bottom:8px;
+    font-size:20px;
+    color:#fff;
+}
+
+.eule-card p{
+    color:rgba(255,255,255,.92);
+    line-height:1.45;
+}
+
+.eule-card .eule-dot{
+    position:relative;
+    z-index:1;
+    width:18px;
+    height:18px;
+    border:2px solid rgba(255,255,255,.55);
+    box-shadow:0 2px 10px rgba(0,0,0,.12);
+}
+
+.eule-card:nth-child(1){
+    background:linear-gradient(180deg,#1f8f5a,#16794a);
+}
+.eule-card:nth-child(2){
+    background:linear-gradient(180deg,#c58c00,#a96f00);
+}
+.eule-card:nth-child(3){
+    background:linear-gradient(180deg,#cc4a4a,#ad3131);
+}
+.eule-card:nth-child(4){
+    background:linear-gradient(180deg,#2f6fe4,#2556b4);
+}
+
+.eule-card.active{
+    transform:translateY(-3px) scale(1.01);
+    box-shadow:0 18px 36px rgba(10,28,57,.20);
+}
+
+.eule-details{
+    background:#fff;
+    color:#111827;
+    border:1px solid #dbe5f3;
+}
+
+.eule-details h3{
+    color:#0f2740;
+}
+
+.eule-details h4{
+    color:#0f2740;
+    margin:0 0 8px;
+    font-size:18px;
+}
+
+.eule-details ul{
+    color:#111827;
+}
+
+.eule-details li{
+    margin-bottom:8px;
+}
+
+.eule-details .note{
+    color:#4b5563;
+}
+
+@media (prefers-color-scheme: dark){
+    .eule-details{
+        background:#101826;
+        color:#e5eefc;
+        border-color:#22314a;
+    }
+
+    .eule-details h3,
+    .eule-details h4{
+        color:#f1f7ff;
+    }
+
+    .eule-details ul{
+        color:#e5eefc;
+    }
+
+    .eule-details .note{
+        color:#b4c2d6;
+    }
+}
