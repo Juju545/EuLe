@@ -9,10 +9,16 @@
 <body>
 
 <header class="hero">
-    <div class="hero-copy">
-        <div class="badge">🟢 EuLe online</div>
-        <h1>🦉 EuLe</h1>
-        <p>Dein digitaler Schulassistent</p>
+    <div class="hero-top">
+        <div class="hero-copy">
+            <div class="badge">🟢 EuLe online</div>
+            <h1>🦉 EuLe</h1>
+            <p>Dein digitaler Schulassistent</p>
+        </div>
+
+        <button class="theme-toggle" type="button" onclick="cycleTheme()" aria-label="Farbschema wechseln">
+            <span id="themeLabel">System</span>
+        </button>
     </div>
 
     <label class="search-shell" aria-label="Suche">
@@ -22,13 +28,13 @@
 </header>
 
 <main class="cards" id="homeView">
-    <button class="card" type="button" onclick="showView('mapsView')">
+    <button class="card" type="button" onclick="navigateTo('mapsView')">
         <div class="card-emoji">🗺️</div>
         <h2>Gebäudepläne</h2>
         <p>EG, OG1, OG2 und Cluster.</p>
     </button>
 
-    <button class="card" type="button" onclick="showView('euleView')">
+    <button class="card" type="button" onclick="navigateTo('euleView')">
         <div class="card-emoji">📚</div>
         <h2>Eule-System</h2>
         <p>Privilegien und Pflichten.</p>
@@ -46,22 +52,28 @@
         <p>Fragen direkt stellen.</p>
     </button>
 
-    <button class="card" type="button" onclick="showView('notesView')">
+    <button class="card" type="button" onclick="navigateTo('notesView')">
         <div class="card-emoji">📝</div>
         <h2>Notizen</h2>
         <p>Texte speichern und kopieren.</p>
     </button>
 
-    <button class="card" type="button" onclick="showView('todoView')">
+    <button class="card" type="button" onclick="navigateTo('todoView')">
         <div class="card-emoji">✅</div>
         <h2>To-do</h2>
         <p>Aufgaben abhaken und kopieren.</p>
+    </button>
+
+    <button class="card" type="button" onclick="navigateTo('calculatorView')">
+        <div class="card-emoji">🧮</div>
+        <h2>Rechner</h2>
+        <p>Einfach rechnen.</p>
     </button>
 </main>
 
 <section class="panel" id="mapsView" hidden>
     <div class="panel-topbar">
-        <button class="back-btn" type="button" onclick="showView('homeView')">← Zurück</button>
+        <button class="back-btn" type="button" onclick="showHome()">← Zurück</button>
         <div>
             <h2>🗺️ Gebäudepläne</h2>
             <p>Plan auswählen und später Räume markieren.</p>
@@ -90,7 +102,7 @@
 
 <section class="panel" id="euleView" hidden>
     <div class="panel-topbar">
-        <button class="back-btn" type="button" onclick="showView('homeView')">← Zurück</button>
+        <button class="back-btn" type="button" onclick="showHome()">← Zurück</button>
         <div>
             <h2>📚 Eule-System</h2>
             <p>Wähle ein Level, um Details zu sehen.</p>
@@ -127,7 +139,7 @@
 
 <section class="panel" id="notesView" hidden>
     <div class="panel-topbar">
-        <button class="back-btn" type="button" onclick="showView('homeView')">← Zurück</button>
+        <button class="back-btn" type="button" onclick="showHome()">← Zurück</button>
         <div>
             <h2>📝 Notizen</h2>
             <p>Einträge bearbeiten, kopieren und speichern.</p>
@@ -143,7 +155,7 @@
 
 <section class="panel" id="todoView" hidden>
     <div class="panel-topbar">
-        <button class="back-btn" type="button" onclick="showView('homeView')">← Zurück</button>
+        <button class="back-btn" type="button" onclick="showHome()">← Zurück</button>
         <div>
             <h2>✅ To-do</h2>
             <p>Aufgaben abhaken, kopieren und speichern.</p>
@@ -155,6 +167,53 @@
     </div>
 
     <div class="entry-list" id="todoList"></div>
+</section>
+
+
+<section class="panel" id="calculatorView" hidden>
+    <div class="panel-topbar">
+        <button class="back-btn" type="button" onclick="showHome()">← Zurück</button>
+        <div>
+            <h2>🧮 Rechner</h2>
+            <p>Ein einfacher Rechner für Schule und Alltag.</p>
+        </div>
+        <div class="panel-spacer"></div>
+    </div>
+
+    <div class="calculator-shell">
+        <div class="calc-display-wrap">
+            <input id="calcDisplay" class="calc-display" type="text" inputmode="decimal" readonly value="">
+        </div>
+
+        <div class="calculator-grid" id="calculatorKeys">
+            <button type="button" class="calc-btn calc-muted" data-calc="C">C</button>
+            <button type="button" class="calc-btn calc-muted" data-calc="⌫">⌫</button>
+            <button type="button" class="calc-btn calc-muted" data-calc="(">(</button>
+            <button type="button" class="calc-btn calc-muted" data-calc=")">)</button>
+
+            <button type="button" class="calc-btn" data-calc="7">7</button>
+            <button type="button" class="calc-btn" data-calc="8">8</button>
+            <button type="button" class="calc-btn" data-calc="9">9</button>
+            <button type="button" class="calc-btn calc-operator" data-calc="/">÷</button>
+
+            <button type="button" class="calc-btn" data-calc="4">4</button>
+            <button type="button" class="calc-btn" data-calc="5">5</button>
+            <button type="button" class="calc-btn" data-calc="6">6</button>
+            <button type="button" class="calc-btn calc-operator" data-calc="*">×</button>
+
+            <button type="button" class="calc-btn" data-calc="1">1</button>
+            <button type="button" class="calc-btn" data-calc="2">2</button>
+            <button type="button" class="calc-btn" data-calc="3">3</button>
+            <button type="button" class="calc-btn calc-operator" data-calc="-">−</button>
+
+            <button type="button" class="calc-btn calc-wide" data-calc="0">0</button>
+            <button type="button" class="calc-btn" data-calc=".">.</button>
+            <button type="button" class="calc-btn calc-operator" data-calc="+">+</button>
+
+            <button type="button" class="calc-btn calc-wide calc-equals" data-calc="=">=</button>
+            <button type="button" class="calc-btn calc-wide calc-muted" data-calc="AC">Alles löschen</button>
+        </div>
+    </div>
 </section>
 
 <button class="chat-button" type="button" aria-label="EuLe öffnen" onclick="openChat()">🦉</button>
@@ -246,11 +305,13 @@
 </div>
 
 <script src="js/data.js"></script>
+<script src="js/theme.js"></script>
 <script src="js/maps.js"></script>
 <script src="js/notes.js"></script>
 <script src="js/todo.js"></script>
 <script src="js/timer.js"></script>
 <script src="js/eule.js"></script>
+<script src="js/calculator.js"></script>
 <script src="js/app.js"></script>
 
 </body>
