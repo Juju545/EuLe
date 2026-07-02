@@ -6,7 +6,7 @@ const timerAdjust = document.getElementById("timerAdjust");
 const timerProgressBar = document.getElementById("timerProgressBar");
 const timerFinish = document.getElementById("timerFinish");
 
-const phases = [
+const timerPhases = [
     { name: "Vorbereitung", duration: 10 * 60 },
     { name: "Arbeitsphase 1", duration: 30 * 60 },
     { name: "Wechselphase", duration: 5 * 60 },
@@ -15,143 +15,140 @@ const phases = [
 ];
 
 let phaseIndex = 0;
-let remainingSeconds = phases[0].duration;
+let remainingSeconds = timerPhases[0].duration;
 let timerInterval = null;
-let isRunning = false;
-let hasStartedOnce = false;
-let isTransitioning = false;
-let isFullscreen = false;
+let running = false;
+let started = false;
+let inTransition = false;
+let fullscreenMode = false;
+let manualBaseSeconds = timerPhases[0].duration;
 
-function formatTime(totalSeconds) {
+function formatTime(totalSeconds){
     const minutes = Math.floor(totalSeconds / 60);
     const seconds = totalSeconds % 60;
     return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
 }
 
-function updateTimerView() {
-    const phase = phases[phaseIndex];
-    timerStatus.textContent = `Phase ${phaseIndex + 1} / ${phases.length}`;
+function updateTimerView(){
+    const phase = timerPhases[phaseIndex];
+    timerStatus.textContent = `Phase ${phaseIndex + 1} / ${timerPhases.length}`;
     timerPhaseTitle.textContent = phase.name;
     timerDisplay.textContent = formatTime(remainingSeconds);
 
-    const progress = ((phase.duration - remainingSeconds) / phase.duration) * 100;
-    timerProgressBar.style.width = `${Math.max(0, Math.min(100, progress))}%`;
+    const elapsed = phase.duration - remainingSeconds;
+    const progress = Math.max(0, Math.min(100, (elapsed / phase.duration) * 100));
+    timerProgressBar.style.width = `${progress}%`;
 
-    const showAdjust = !hasStartedOnce && phaseIndex === 0 && !isTransitioning;
-    timerAdjust.style.display = showAdjust ? "flex" : "none";
-
-    timerFinish.hidden = !(phaseIndex === phases.length - 1 && remainingSeconds === 0 && !isRunning);
+    timerAdjust.style.display = (!started && phaseIndex === 0 && !inTransition) ? "flex" : "none";
+    timerFinish.hidden = !(phaseIndex === timerPhases.length - 1 && remainingSeconds === 0 && !running);
 }
 
-function openTimer() {
+function openTimer(){
     timerOverlay.classList.add("is-visible");
     timerOverlay.setAttribute("aria-hidden", "false");
     updateTimerView();
 }
 
-function closeTimer() {
+function closeTimer(){
     pauseTimer();
     timerOverlay.classList.remove("is-visible", "flash");
     timerOverlay.setAttribute("aria-hidden", "true");
-    if (isFullscreen && document.fullscreenElement) {
-        document.exitFullscreen().catch(() => {});
-        isFullscreen = false;
-    }
-}
-
-function toggleTimerFullscreen() {
-    const card = timerOverlay.querySelector(".timer-card");
-    if (!document.fullscreenElement) {
-        card.requestFullscreen?.().catch(() => {});
-        isFullscreen = true;
-    } else {
+    timerOverlay.classList.remove("flash");
+    if (fullscreenMode && document.fullscreenElement){
         document.exitFullscreen?.().catch(() => {});
-        isFullscreen = false;
+        fullscreenMode = false;
     }
 }
 
-function adjustTime(deltaSeconds) {
-    if (hasStartedOnce || isRunning || isTransitioning || phaseIndex !== 0) return;
+function toggleTimerFullscreen(){
+    const card = timerOverlay.querySelector(".timer-card");
+    if (!document.fullscreenElement){
+        card.requestFullscreen?.().catch(() => {});
+        fullscreenMode = true;
+    }else{
+        document.exitFullscreen?.().catch(() => {});
+        fullscreenMode = false;
+    }
+}
+
+function adjustTime(deltaSeconds){
+    if (started || running || inTransition || phaseIndex !== 0) return;
     remainingSeconds = Math.max(60, remainingSeconds + deltaSeconds);
-    phases[0].duration = remainingSeconds;
+    manualBaseSeconds = remainingSeconds;
+    timerPhases[0].duration = manualBaseSeconds;
     updateTimerView();
 }
 
-function startTimer() {
-    if (isRunning || isTransitioning) return;
-
-    hasStartedOnce = true;
-    isRunning = true;
+function startTimer(){
+    if (running || inTransition) return;
+    started = true;
+    running = true;
     updateTimerView();
 
     timerInterval = setInterval(() => {
-        if (remainingSeconds > 0) {
+        if (remainingSeconds > 0){
             remainingSeconds -= 1;
             updateTimerView();
         }
 
-        if (remainingSeconds <= 0) {
+        if (remainingSeconds <= 0){
             handlePhaseEnd();
         }
     }, 1000);
-
-    updateTimerView();
 }
 
-function pauseTimer() {
-    if (timerInterval) {
+function pauseTimer(){
+    if (timerInterval){
         clearInterval(timerInterval);
         timerInterval = null;
     }
-    isRunning = false;
+    running = false;
     updateTimerView();
 }
 
-function resetTimer() {
+function resetTimer(){
     pauseTimer();
-    isTransitioning = false;
     phaseIndex = 0;
-    remainingSeconds = phases[0].duration;
-    hasStartedOnce = false;
+    remainingSeconds = timerPhases[0].duration = manualBaseSeconds;
+    started = false;
+    inTransition = false;
     timerOverlay.classList.remove("flash");
     timerFinish.hidden = true;
     updateTimerView();
 }
 
-async function handlePhaseEnd() {
-    if (isTransitioning) return;
-
-    isTransitioning = true;
+async function handlePhaseEnd(){
+    if (inTransition) return;
+    inTransition = true;
     pauseTimer();
+
     timerOverlay.classList.add("flash");
-
     await flashScreen(3);
-
     timerOverlay.classList.remove("flash");
+    timerOverlay.offsetHeight;
 
-    if (phaseIndex < phases.length - 1) {
+    if (phaseIndex < timerPhases.length - 1){
         phaseIndex += 1;
-        remainingSeconds = phases[phaseIndex].duration;
-        isTransitioning = false;
+        remainingSeconds = timerPhases[phaseIndex].duration;
+        inTransition = false;
         updateTimerView();
         startTimer();
-    } else {
-        isRunning = false;
-        isTransitioning = false;
+    }else{
+        running = false;
+        inTransition = false;
         timerFinish.hidden = false;
         timerFinish.textContent = "🎉 Timer beendet.";
         updateTimerView();
     }
 }
 
-function flashScreen(times) {
+function flashScreen(times){
     return new Promise((resolve) => {
         let count = 0;
         const interval = setInterval(() => {
             timerOverlay.classList.toggle("flash");
             count += 1;
-
-            if (count >= times * 2) {
+            if (count >= times * 2){
                 clearInterval(interval);
                 timerOverlay.classList.remove("flash");
                 resolve();
