@@ -45,6 +45,18 @@
         <h2>EuLe</h2>
         <p>Fragen direkt stellen.</p>
     </button>
+
+    <button class="card" type="button" onclick="showView('notesView')">
+        <div class="card-emoji">📝</div>
+        <h2>Notizen</h2>
+        <p>Texte speichern und kopieren.</p>
+    </button>
+
+    <button class="card" type="button" onclick="showView('todoView')">
+        <div class="card-emoji">✅</div>
+        <h2>To-do</h2>
+        <p>Aufgaben abhaken und kopieren.</p>
+    </button>
 </main>
 
 <section class="panel" id="mapsView" hidden>
@@ -112,6 +124,39 @@
     <div class="eule-details" id="euleDetails"></div>
 </section>
 
+
+<section class="panel" id="notesView" hidden>
+    <div class="panel-topbar">
+        <button class="back-btn" type="button" onclick="showView('homeView')">← Zurück</button>
+        <div>
+            <h2>📝 Notizen</h2>
+            <p>Einträge bearbeiten, kopieren und speichern.</p>
+        </div>
+        <div class="panel-actions">
+            <button class="action-btn" type="button" onclick="notesCopyAll()">📋 Alles kopieren</button>
+            <button class="action-btn" type="button" onclick="notesAdd()">➕ Neu</button>
+        </div>
+    </div>
+
+    <div class="entry-list" id="notesList"></div>
+</section>
+
+<section class="panel" id="todoView" hidden>
+    <div class="panel-topbar">
+        <button class="back-btn" type="button" onclick="showView('homeView')">← Zurück</button>
+        <div>
+            <h2>✅ To-do</h2>
+            <p>Aufgaben abhaken, kopieren und speichern.</p>
+        </div>
+        <div class="panel-actions">
+            <button class="action-btn" type="button" onclick="todoCopyAll()">📋 Alles kopieren</button>
+            <button class="action-btn" type="button" onclick="todoAdd()">➕ Neu</button>
+        </div>
+    </div>
+
+    <div class="entry-list" id="todoList"></div>
+</section>
+
 <button class="chat-button" type="button" aria-label="EuLe öffnen" onclick="openChat()">🦉</button>
 
 <div class="chat-window" id="chatWindow" aria-label="EuLe Chat">
@@ -150,6 +195,7 @@
         <div class="timer-topbar">
             <button class="timer-back" type="button" onclick="closeTimer()">← Zurück</button>
             <div class="timer-chip">⏱️ Timer</div>
+            <button class="timer-settings-btn" type="button" onclick="openTimerSettings()" aria-label="Timer Einstellungen öffnen">⚙️</button>
             <button class="timer-fullscreen" type="button" onclick="toggleTimerFullscreen()" aria-label="Vollbild umschalten">⤢</button>
         </div>
 
@@ -176,7 +222,33 @@
     </section>
 </div>
 
+
+<div id="timerSettingsOverlay" class="timer-settings-overlay" aria-hidden="true">
+    <section class="timer-settings-card" role="dialog" aria-modal="true" aria-label="Timer Einstellungen">
+        <div class="timer-settings-top">
+            <h3>⚙️ Timer-Einstellungen</h3>
+            <button type="button" class="close-button dark" onclick="closeTimerSettings()">×</button>
+        </div>
+
+        <div class="settings-grid">
+            <label><span>Vorbereitung</span><input type="number" id="setPrep" min="1"></label>
+            <label><span>Arbeitsphase 1</span><input type="number" id="setWork1" min="1"></label>
+            <label><span>Wechselphase</span><input type="number" id="setSwitch" min="1"></label>
+            <label><span>Arbeitsphase 2</span><input type="number" id="setWork2" min="1"></label>
+            <label><span>Abschluss</span><input type="number" id="setEnd" min="1"></label>
+        </div>
+
+        <div class="settings-actions">
+            <button type="button" class="action-btn" onclick="saveTimerSettings()">Speichern</button>
+            <button type="button" class="action-btn secondary" onclick="closeTimerSettings()">Abbrechen</button>
+        </div>
+    </section>
+</div>
+
 <script src="js/data.js"></script>
+<script src="js/maps.js"></script>
+<script src="js/notes.js"></script>
+<script src="js/todo.js"></script>
 <script src="js/timer.js"></script>
 <script src="js/eule.js"></script>
 <script src="js/app.js"></script>

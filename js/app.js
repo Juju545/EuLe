@@ -9,64 +9,24 @@ const mapSearch = document.getElementById("mapSearch");
 const planFrame = document.getElementById("planFrame");
 const mapResult = document.getElementById("mapResult");
 
-const viewIds = ["homeView", "mapsView", "euleView"];
+const views = ["homeView", "mapsView", "euleView", "notesView", "todoView"];
 
-function showView(viewId){
-    viewIds.forEach(id => {
+function showView(viewId) {
+    views.forEach(id => {
         const el = document.getElementById(id);
         if (el) el.hidden = id !== viewId;
     });
-    if (viewId === "homeView") {
-        document.querySelector(".hero")?.scrollIntoView({ behavior: "smooth", block: "start" });
-    } else {
-        document.getElementById(viewId)?.scrollIntoView({ behavior: "smooth", block: "start" });
-    }
 }
 
-function openChat(){
+function openChat() {
     chatWindow.style.display = "flex";
 }
 
-function closeChatWindow(){
+function closeChatWindow() {
     chatWindow.style.display = "none";
 }
 
-chatButton?.addEventListener("click", openChat);
-closeChat?.addEventListener("click", closeChatWindow);
-
-sendButton?.addEventListener("click", sendMessage);
-userInput?.addEventListener("keydown", (event) => {
-    if (event.key === "Enter") sendMessage();
-});
-
-homeSearch?.addEventListener("keydown", (event) => {
-    if (event.key === "Enter"){
-        routeSearch(homeSearch.value);
-    }
-});
-
-function routeSearch(query){
-    if (!query) return;
-    const lower = query.toLowerCase().trim();
-
-    if (lower.includes("timer")){
-        openTimer();
-        return;
-    }
-    if (lower.includes("eule") || lower.includes("grün") || lower.includes("gelb") || lower.includes("rot")){
-        showView("euleView");
-        if (lower.includes("gelb")) selectEuleLevel("gelb");
-        else if (lower.includes("rot")) selectEuleLevel("rot");
-        else if (lower.includes("mini")) selectEuleLevel("mini");
-        else selectEuleLevel("gruen");
-        return;
-    }
-    showView("mapsView");
-    mapSearch.value = query;
-    searchMap();
-}
-
-function addMessage(text, sender){
+function addMessage(text, sender) {
     const bubble = document.createElement("div");
     bubble.className = sender === "user" ? "user-message" : "bot-message";
     bubble.innerHTML = text;
@@ -74,78 +34,58 @@ function addMessage(text, sender){
     chatMessages.scrollTop = chatMessages.scrollHeight;
 }
 
-function matchRoom(query){
-    const normalized = query.toLowerCase().replace(/[-]/g, " ").replace(/\s+/g, " ").trim();
-    return EuleData.roomIndex.find(entry => entry.terms.some(term => normalized.includes(term.toLowerCase())));
-}
-
-function showMap(mapKey){
-    const map = EuleData.maps[mapKey];
+function renderMap(mapId) {
+    const map = EuleData.maps[mapId];
     if (!map) return;
     planFrame.src = map.src;
     mapResult.textContent = map.hint;
     document.querySelectorAll(".map-tab").forEach(btn => btn.classList.remove("active"));
-    const buttons = Array.from(document.querySelectorAll(".map-tab"));
-    const index = ["eg", "og1", "og2", "cluster"].indexOf(mapKey);
-    if (buttons[index]) buttons[index].classList.add("active");
+    const idx = { eg: 0, og1: 1, og2: 2, cluster: 3 }[mapId];
+    const buttons = document.querySelectorAll(".map-tab");
+    if (buttons[idx]) buttons[idx].classList.add("active");
 }
 
-function searchMap(){
+function showMap(mapId) {
+    renderMap(mapId);
+}
+
+function searchMap() {
     const q = (mapSearch?.value || "").trim();
-    if (!q){
+    if (!q) {
         mapResult.textContent = "Bitte einen Raum oder Ort eingeben.";
         return;
     }
-
-    const hit = matchRoom(q);
-    if (hit){
-        showMap(hit.map);
-        mapResult.textContent = hit.answer;
+    const found = focusMapForQuery(q);
+    if (found) {
+        mapResult.textContent = found;
         return;
     }
-
-    const lower = q.toLowerCase();
-    if (lower.includes("eg") || lower.includes("mensa") || lower.includes("bücherei") || lower.includes("bibliothek") || lower.includes("verwaltung")){
-        showMap("eg");
-        mapResult.textContent = "Der passende Plan ist das Erdgeschoss.";
-        return;
-    }
-    if (lower.includes("og1") || lower.includes("1.0") || lower.includes("1.")){
-        showMap("og1");
-        mapResult.textContent = "Der passende Plan ist das 1. Obergeschoss.";
-        return;
-    }
-    if (lower.includes("og2") || lower.includes("2.0") || lower.includes("2.")){
-        showMap("og2");
-        mapResult.textContent = "Der passende Plan ist das 2. Obergeschoss.";
-        return;
-    }
-    if (lower.includes("cluster") || lower.includes("pausenhalle")){
-        showMap("cluster");
-        mapResult.textContent = "Der passende Plan ist der Realschul-Cluster.";
-        return;
-    }
-
-    mapResult.textContent = "Diesen Raum kenne ich noch nicht. In einer späteren Version markieren wir ihn direkt im Plan.";
+    mapResult.textContent = "Diesen Raum kenne ich noch nicht. In Version 1.5 kommt die Markierung direkt auf dem Plan.";
 }
 
-function getBotAnswer(message){
-    const msg = message.toLowerCase();
+function getBotAnswer(message) {
+    const msg = message.toLowerCase().trim();
 
-    if (msg.includes("hallo") || msg.includes("hi") || msg.includes("guten morgen") || msg.includes("guten tag")) {
-        return "👋 Hallo! Schön, dass du da bist.";
+    if (["hallo", "hi", "guten morgen", "guten tag"].some(x => msg.includes(x))) {
+        return "👋 Hallo! Wie kann ich dir helfen?";
     }
 
-    if (msg.includes("hilfe")){
-        return "🦉 Ich kann dir bei Gebäudeplänen, dem Eule-System und dem Timer helfen.";
-    }
-
-    if (msg.includes("timer")){
+    if (msg.includes("timer")) {
         openTimer();
         return "⏱️ Ich habe den Timer geöffnet.";
     }
 
-    if (msg.includes("eule-system") || msg.includes("eule system") || msg.includes("grüne eule") || msg.includes("gelbe eule") || msg.includes("rote eule") || msg.includes("mini-eule")){
+    if (msg.includes("notiz") || msg.includes("notizen")) {
+        showView("notesView");
+        return "📝 Ich habe die Notizen geöffnet.";
+    }
+
+    if (msg.includes("todo") || msg.includes("to-do") || msg.includes("aufgabe")) {
+        showView("todoView");
+        return "✅ Ich habe die To-do-Liste geöffnet.";
+    }
+
+    if (msg.includes("eule") && (msg.includes("grün") || msg.includes("gelb") || msg.includes("rot") || msg.includes("mini"))) {
         showView("euleView");
         if (msg.includes("gelb")) selectEuleLevel("gelb");
         else if (msg.includes("rot")) selectEuleLevel("rot");
@@ -154,63 +94,107 @@ function getBotAnswer(message){
         return "📚 Ich habe das Eule-System geöffnet.";
     }
 
-    const hit = matchRoom(msg);
-    if (hit){
+    const mapAnswer = focusMapForQuery(msg);
+    if (mapAnswer) {
         showView("mapsView");
-        showMap(hit.map);
-        return hit.answer;
+        return mapAnswer;
     }
 
-    if (msg.includes("plan") || msg.includes("gebäude") || msg.includes("gebäudeplan") || msg.includes("räume") || msg.includes("raum")){
-        showView("mapsView");
-        return "🗺️ Ich habe die Gebäudepläne geöffnet. Du kannst jetzt einen Raum oder Ort suchen.";
+    if (msg.includes("hilfe")) {
+        return "🦉 Ich kann dir bei Gebäuden, dem Eule-System, dem Timer, Notizen und To-dos helfen.";
     }
 
-    if (msg.includes("grüne eule") || msg.includes("gruene eule")){
-        showView("euleView");
-        selectEuleLevel("gruen");
-        return "🦉 Die grüne Eule bietet die meisten Freiheiten.";
-    }
-
-    return "🦉 Das habe ich noch nicht gelernt. Ich helfe dir aber bei Gebäuden, Eule-System und Timer.";
+    return "🦉 Ich habe das noch nicht gelernt. Frag mich gern nach Gebäuden, Timer, Notizen oder To-dos.";
 }
 
-function sendMessage(){
+function sendMessage() {
     const text = userInput.value.trim();
     if (!text) return;
-
     addMessage(text, "user");
     userInput.value = "";
+    setTimeout(() => addMessage(getBotAnswer(text), "bot"), 350);
+}
 
-    setTimeout(() => {
-        addMessage(getBotAnswer(text), "bot");
-    }, 450);
+chatButton?.addEventListener("click", openChat);
+closeChat?.addEventListener("click", closeChatWindow);
+sendButton?.addEventListener("click", sendMessage);
+userInput?.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") sendMessage();
+});
+
+if (homeSearch) {
+    homeSearch.addEventListener("keydown", (event) => {
+        if (event.key === "Enter") {
+            const q = homeSearch.value.trim();
+            if (!q) return;
+            const timerKeywords = /timer/i;
+            const euleKeywords = /(eule|grün|gelb|rot|mini)/i;
+            const todoKeywords = /(todo|to-do|aufgabe)/i;
+            const noteKeywords = /(notiz|notizen)/i;
+
+            if (timerKeywords.test(q)) {
+                openTimer();
+                return;
+            }
+            if (noteKeywords.test(q)) {
+                showView("notesView");
+                return;
+            }
+            if (todoKeywords.test(q)) {
+                showView("todoView");
+                return;
+            }
+            if (euleKeywords.test(q)) {
+                showView("euleView");
+                return;
+            }
+
+            const result = focusMapForQuery(q);
+            if (result) {
+                showView("mapsView");
+                mapResult.textContent = result;
+            }
+        }
+    });
 }
 
 document.querySelectorAll(".quick-btn").forEach((button) => {
     button.addEventListener("click", () => {
         const action = button.dataset.action;
-
-        if (action === "openTimer"){
+        if (action === "openTimer") {
             openTimer();
             return;
         }
-
-        if (action === "open"){
+        if (action === "open") {
             const target = button.dataset.target;
             showView(target);
-            if (target === "mapsView") showMap("eg");
+            if (target === "mapsView") renderMap("eg");
             if (target === "euleView") selectEuleLevel("gruen");
             return;
         }
-
         const value = button.dataset.value || button.textContent.trim();
-        if (userInput){
+        if (userInput) {
             userInput.value = value;
             userInput.focus();
         }
     });
 });
 
-showMap("eg");
+function showHome() {
+    showView("homeView");
+}
+
+showView("homeView");
+renderMap("eg");
 selectEuleLevel("gruen");
+
+// expose helper for inline onclick
+window.showView = showView;
+window.openChat = openChat;
+window.openTimer = window.openTimer || function(){};
+window.closeTimer = window.closeTimer || function(){};
+window.toggleTimerFullscreen = window.toggleTimerFullscreen || function(){};
+window.renderMap = renderMap;
+window.showMap = showMap;
+window.searchMap = searchMap;
+window.showHome = showHome;
